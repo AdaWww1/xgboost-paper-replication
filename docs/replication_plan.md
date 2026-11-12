@@ -1,4 +1,3 @@
-
 # Replication Plan
 
 ## 1. Objective
