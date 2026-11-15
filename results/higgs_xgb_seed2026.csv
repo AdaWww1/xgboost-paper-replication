@@ -1,0 +1,2 @@
+method,time_per_tree_sec,test_auc,seed,num_rounds
+XGBoost,0.03316716480255127,0.8221771108528697,2026,500
