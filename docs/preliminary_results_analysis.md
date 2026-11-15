@@ -25,7 +25,7 @@ The current preliminary experiments use the following configuration:
 
 ## 3. Preliminary Experimental Results
 
-The following results were collected from the three CSV files uploaded to the project repository.
+The following results were collected from three experimental records in the preliminary results CSV file.
 
 | Random Seed | Test AUC | Time per Tree (s) |
 |---|---:|---:|
