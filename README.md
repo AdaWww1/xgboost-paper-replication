@@ -73,6 +73,14 @@ xgboost-paper-replication/
 ├── docs/
 │   ├── paper_notes.md
 │   └── replication_plan.md
+├── logs/
+│   ├── higgs_xgb_seed42.log
+│   ├── higgs_xgb_seed123.log
+│   └── higgs_xgb_seed2026.log
+├── results/
+│   ├── higgs_xgb_seed42.csv
+│   ├── higgs_xgb_seed123.csv
+│   └── higgs_xgb_seed2026.csv
 └── scripts/
     ├── download_higgs.py
     └── train_higgs.py
@@ -85,9 +93,13 @@ xgboost-paper-replication/
 - `requirements.txt`: Python package dependencies.
 - `README.md`: Project overview and instructions.
 
-The `data/`, `results/` and `logs/`
-directories may be generated locally
-during data preparation and experiments.
+The `data/` directory is created locally
+during dataset preparation and is excluded
+from GitHub.
+
+The `results/` and `logs/` directories
+contain preliminary experiment outputs
+committed for reproducibility and analysis.
 
 Additional analysis scripts and result files
 will be added as the project progresses.
@@ -122,6 +134,13 @@ The script is designed to extract
 
 `data/HIGGS_1M.csv`
 
+The current extraction method selects the
+first 1,000,000 rows of the original HIGGS
+dataset rather than a randomly sampled subset.
+
+This difference from the original paper
+is documented in the replication plan.
+
 The downloaded dataset should not be
 committed to GitHub because of its size.
 
@@ -143,14 +162,45 @@ this section will be updated with:
 - Expected output files
 - Actual runtime information
 
-
 ## 7. Experimental Results
 
-Experimental results will be compared with the original paper using the same evaluation metrics where possible.
+### Preliminary XGBoost Results
 
-Results will be reported as mean ± standard deviation across at least three random seeds.
+The initial XGBoost training implementation
+has been added to the repository.
 
-All reported results will be traceable to experimental logs.
+Three preliminary result files have been
+uploaded for random seeds 42, 123 and 2026.
+
+| Seed | Test AUC | Time per Tree (s) |
+|---|---|---|
+| 42 | 0.82278 | 0.04274 |
+| 123 | 0.82230 | 0.03324 |
+| 2026 | 0.82218 | 0.03317 |
+
+These results are preliminary and require
+further reproducibility verification.
+
+The committed training script currently
+uses a fixed random seed and 27 features
+instead of the expected 28 features.
+
+The log for seed 42 also requires correction.
+
+Therefore, the results are not yet treated
+as validated three-seed reproduction results.
+
+### Remaining Work
+
+- Verify all three random-seed experiments.
+- Correct the feature selection.
+- Complete the scikit-learn baseline.
+- Calculate mean and standard deviation.
+- Compare the validated results with Table 3.
+- Analyze differences from the original paper.
+
+The final results will be updated after
+the experiment pipeline has been validated.
 
 ## 8. Project Status
 
@@ -166,14 +216,23 @@ paper analysis and experiment planning.
 - Added the dataset preparation script.
 - Created the initial training script.
 - Established the repository structure.
+- Completed an initial XGBoost training run.
+- Uploaded preliminary XGBoost results
+  for three random seeds.
+- Identified reproducibility issues
+  requiring further validation.
 
 ### Work in Progress
 
-- Environment and dependency validation.
-- Completing the model training pipeline.
-- Implementing evaluation and result logging.
-- Preparing repeated experiments using
-  multiple random seeds.
+- Correcting the feature selection to use
+  all 28 numerical features.
+- Improving random seed configuration
+  and experiment reproducibility.
+- Validating the three preliminary
+  XGBoost result files and logs.
+- Completing the scikit-learn baseline.
+- Implementing statistical result analysis.
+- Preparing the extension experiment.
 
 The main experimental results have not
 yet been finalized.
