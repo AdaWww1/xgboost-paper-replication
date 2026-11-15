@@ -1,0 +1,2 @@
+experiment_type,model,max_depth,runs,seeds,mean_test_auc,std_test_auc,mean_train_time_sec,mean_time_per_tree_sec
+preliminary_main_reproduction,XGBoost,8,3,42;123;2026,0.82242,0.000316,18.1915,0.036383
