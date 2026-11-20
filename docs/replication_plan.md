@@ -66,42 +66,59 @@ as a reproduction deviation.
 
 ### Data Splitting
 
-The current implementation uses:
+The updated XGBoost training implementation uses:
 
-- Training set: 80%
-- Test set: 20%
-- Random state: 42
+- Training set: 70%
+- Validation set: 15%
+- Test set: 15%
 
-The final experimental procedure will be checked
-against the original paper before conducting
-the main reproduction.
+For a dataset of 1,000,000 samples,
+this corresponds to approximately:
 
-The same train/test split must be used when
-comparing XGBoost and scikit-learn.
+- 700,000 training samples
+- 150,000 validation samples
+- 150,000 test samples
+
+The validation set is used to monitor AUC
+during the boosting process.
+
+The held-out test set is used for final
+performance evaluation.
+
+The planned random seeds are 42, 123 and 2026.
+
+For a fair comparison, XGBoost and the
+scikit-learn baseline should use identical
+data splits for each random seed.
 
 ### Model Configuration
 
-| Parameter | Planned Setting |
-|---|---|
-| Models | XGBoost, scikit-learn |
-| Number of trees | 500 |
-| Maximum tree depth | 8 |
-| Learning rate | 0.1 |
-| XGBoost tree method | Exact greedy |
-| Column sampling | 1.0 |
-| Main metric | Test AUC |
-| Efficiency metric | Time per Tree |
+| Parameter | Planned Setting | Current XGBoost Implementation |
+|---|---|---|
+| Dataset | Higgs-1M | Higgs-1M |
+| Input features | 28 | 28 |
+| Number of trees | 500 | 500 |
+| Maximum tree depth | 8 | 8 |
+| Learning rate | 0.1 | 0.1 |
+| Objective | Binary classification | binary:logistic |
+| Evaluation metric | AUC | AUC |
+| Tree method | Exact greedy | Library default |
+| Column sampling | 1.0 | Not explicitly configured |
+| CPU threads | To be aligned | 8 |
+| Random seeds | 42, 123, 2026 | Currently hard-coded to 123 |
 
-The number of trees, maximum depth, shrinkage
-and exact greedy method follow the setting
-described in the original paper.
+The current implementation uses
+the XGBoost Python training API.
 
-The baseline is planned to use
+The tree method is not explicitly specified
+in the current training script.
+
+The scikit-learn baseline is planned to use
 sklearn.ensemble.GradientBoostingClassifier.
 
-Other hyperparameters and implementation
-differences will be documented when the
-training scripts are finalized.
+The baseline implementation and the final
+experimental settings still require validation
+before a fair model comparison can be made.
 
 ## 4. Environment and Reproducibility
 
@@ -151,6 +168,25 @@ For each model, we will report:
 All comparisons will use consistent
 experimental settings.
 
+### Current Implementation Status
+
+Experimental result files and training logs
+are available for seeds 42, 123 and 2026.
+
+However, the committed training script
+currently uses a fixed seed value of 123.
+
+The seed should be made configurable
+through a command-line argument or
+a multi-seed experiment loop.
+
+This is required to reproduce all three
+runs without manually modifying the code.
+
+The consistency of the existing result files
+and training logs will be checked before
+the results are used in the final analysis.
+
 ## 6. Evaluation Method
 
 ### Classification Performance
@@ -163,15 +199,29 @@ calculate the ROC-AUC score.
 
 ### Training Efficiency
 
-The training time will be measured separately
-for each model.
+Training efficiency is measured using the
+elapsed wall-clock training time.
 
 Time per Tree is calculated as:
 
 Time per Tree = Total Training Time / Number of Trees
 
-Training time will exclude dataset downloading
-and preprocessing whenever possible.
+The current XGBoost implementation measures
+the execution time of xgb.train().
+
+This includes the per-round evaluation of
+training and validation AUC.
+
+Dataset loading, data splitting, test-set
+prediction and ROC plotting are excluded.
+
+This timing definition must be considered
+when comparing our results with the paper.
+
+For a fair comparison with scikit-learn,
+the timing protocol and computational
+resources should be aligned or any
+remaining differences clearly documented.
 
 ### Comparison with the Paper
 
@@ -208,20 +258,28 @@ full Higgs-1M reproduction results.
 
 ## 8. Deviations from the Original Paper
 
-| Item | Original Setting | Our Setting | Reason |
+| Item | Original Setting | Current Implementation | Reason or Status |
 |---|---|---|---|
-| Dataset subset | Randomly selected 1M subset | First 1M rows | Current extraction method |
-| Data split | Exact 1M split to be verified | 80/20 random split | Current implementation |
-| Software | 2016 implementations | Modern pinned libraries | Availability |
-| Hardware | Original benchmark machine | Local CPU, to be recorded | Resource availability |
-| Random seeds | Not specified for Table 3 | 42, 123, 2026 | Statistical evaluation |
+| Dataset subset | Higgs-1M subset | First 1M HIGGS rows | Current extraction method |
+| Data split | Exact procedure to be verified | 70/15/15 train/validation/test | Validation monitoring |
+| Input features | 28 | 28 | Feature selection corrected |
+| Tree method | Exact greedy | Library default | Explicit configuration pending |
+| CPU threads | To be verified | 8 | Current training configuration |
+| Software | 2016 implementations | Modern libraries | Software availability |
+| Hardware | Original benchmark machine | To be documented | Hardware availability |
+| Random seeds | Not specified for Table 3 | 42, 123, 2026 | Repeated evaluation |
+| Training-time measurement | Paper benchmark protocol | Training with per-round AUC evaluation | Timing alignment pending |
 
-All deviations will be reviewed after
-the final implementation is available.
+The current results are preliminary
+reproduction results.
 
-The aim is to reproduce the paper's central
-claims while transparently documenting any
-differences in experimental conditions.
+The differences in data preparation,
+tree construction methods, hardware,
+software and timing protocols must be
+considered when interpreting the results.
+
+All remaining deviations will be reviewed
+before the final model comparison.
 
 ## 9. Extension Experiment
 
