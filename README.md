@@ -21,9 +21,21 @@ The main focus is the classification experiment in the original paper. We plan t
 
 ## 3. Starting Code
 
-**Official Repository:** https://github.com/dmlc/xgboost
+**Official XGBoost Repository:**
+https://github.com/dmlc/xgboost
 
-The exact starting commit, license information and modified files will be documented before the experiments.
+**Scikit-learn Repository:**
+https://github.com/scikit-learn/scikit-learn
+
+The project uses existing machine learning
+libraries and develops its own Python scripts
+for dataset preparation, model training,
+result validation and analysis.
+
+The exact installed library versions,
+corresponding upstream source revisions
+where applicable, and license information
+will be documented before final submission.
 
 ## 4. Reproduction Scope
 
@@ -80,29 +92,38 @@ xgboost-paper-replication/
 ├── results/
 │   ├── higgs_xgb_seed42.csv
 │   ├── higgs_xgb_seed123.csv
-│   └── higgs_xgb_seed2026.csv
+│   ├── higgs_xgb_seed2026.csv
+│   ├── higgs_xgb_seed42_curve.csv
+│   ├── higgs_xgb_seed123_curve.csv
+│   ├── higgs_xgb_seed2026_curve.csv
+│   ├── roc_curve_seed42.png
+│   ├── roc_curve_seed123.png
+│   └── roc_curve_seed2026.png
 └── scripts/
     ├── download_higgs.py
-    └── train_higgs.py
+    ├── train_higgs.py
+    └── validate_results.py
 ```
 
 ### Directory Description
 
 - `docs/`: Paper analysis and experimental design.
-- `scripts/`: Dataset preparation and model training.
+- `scripts/`: Dataset preparation, model training
+  and result validation.
+- `logs/`: Detailed training logs.
+- `results/`: Experimental metrics, AUC curves
+  and ROC visualizations.
 - `requirements.txt`: Python package dependencies.
 - `README.md`: Project overview and instructions.
 
-The `data/` directory is created locally
-during dataset preparation and is excluded
-from GitHub.
+The `data/` directory is generated locally
+and excluded from GitHub.
 
-The `results/` and `logs/` directories
-contain preliminary experiment outputs
+Experimental results and training logs are
 committed for reproducibility and analysis.
 
-Additional analysis scripts and result files
-will be added as the project progresses.
+Additional statistical analysis scripts
+and figures will be integrated after review.
 
 ## 6. Environment and Reproducibility
 
@@ -146,96 +167,159 @@ committed to GitHub because of its size.
 
 ### Training Environment
 
-The training pipeline is currently
-under development.
+The XGBoost training implementation has
+been updated to use all 28 input features.
 
-The dependency file and training script
-still require validation before the main
-experiment can be reproduced reliably.
+The current configuration includes:
 
-Once the implementation has been tested,
-this section will be updated with:
+- Training/validation/test split: 70/15/15
+- Number of boosting rounds: 500
+- Maximum tree depth: 8
+- Learning rate: 0.1
+- CPU threads: 8
+- Evaluation metric: AUC
 
-- Verified Python and library versions
-- Installation commands
-- Training commands
-- Expected output files
-- Actual runtime information
+The current training script still uses
+a fixed random seed.
+
+The dependency file, tree construction
+method and complete environment information
+require further verification before all
+experiments can be reproduced reliably.
+
+### Result Validation
+
+The existing experimental outputs can be
+checked using:
+
+```bash
+python scripts/validate_results.py
+```
+
+The validation script checks:
+
+- Required result files and training logs
+- Random seed consistency
+- Number of boosting rounds
+- Validity of AUC and timing values
+- Completeness of training and validation curves
+- Consistency between CSV files and logs
+
+The validation does not require the
+original HIGGS dataset.
+
+Passing these checks confirms file-level
+consistency but does not replace
+independent experimental reruns.
 
 ## 7. Experimental Results
 
-### Preliminary XGBoost Results
+### Updated XGBoost Results
 
-The initial XGBoost training implementation
-has been added to the repository.
-
-Three preliminary result files have been
-uploaded for random seeds 42, 123 and 2026.
+The following preliminary results are
+obtained from the updated experiment
+files for three random seeds.
 
 | Seed | Test AUC | Time per Tree (s) |
-|---|---|---|
-| 42 | 0.82278 | 0.04274 |
-| 123 | 0.82230 | 0.03324 |
-| 2026 | 0.82218 | 0.03317 |
+|---|---:|---:|
+| 42 | 0.832240 | 0.135046 |
+| 123 | 0.830218 | 0.137869 |
+| 2026 | 0.831036 | 0.147877 |
+| Mean | 0.831164 | 0.140264 |
+| Sample Standard Deviation | 0.001017 | 0.006742 |
 
-These results are preliminary and require
-further reproducibility verification.
+The results are calculated from the
+latest CSV files in the results directory.
 
-The committed training script currently
-uses a fixed random seed and 27 features
-instead of the expected 28 features.
+Corresponding training logs are available
+in the logs directory.
 
-The log for seed 42 also requires correction.
+### Comparison with the Original Paper
 
-Therefore, the results are not yet treated
-as validated three-seed reproduction results.
+| Metric | Paper (XGBoost) | Ours (Preliminary) |
+|---|---:|---:|
+| Test AUC | 0.8304 | 0.831164 ± 0.001017 |
+| Time per Tree (s) | 0.6841 | 0.140264 ± 0.006742 |
 
-### Remaining Work
+Reference: Table 3 of the original paper.
 
-- Verify all three random-seed experiments.
-- Correct the feature selection.
-- Complete the scikit-learn baseline.
-- Calculate mean and standard deviation.
-- Compare the validated results with Table 3.
-- Analyze differences from the original paper.
+The current mean Test AUC is numerically
+close to the reference value.
 
-The final results will be updated after
-the experiment pipeline has been validated.
+However, differences in dataset selection,
+data splitting, tree construction methods,
+hardware, software and timing protocols
+prevent a direct equivalence claim.
+
+A fair comparison with scikit-learn
+has not yet been completed.
+
+### ROC Visualization
+
+The following figure shows the ROC curve
+from the experiment recorded for seed 42.
+
+![ROC Curve for Seed 42](results/roc_curve_seed42.png)
+
+Additional ROC curves are available for
+seeds 123 and 2026.
+
+Training and validation AUC values across
+500 boosting rounds are also included
+in the results directory.
+
+### Reproducibility Limitations
+
+- The committed training script still
+  uses a fixed random seed.
+- The XGBoost tree method is not
+  explicitly configured.
+- Hardware and software information
+  is not yet fully documented.
+- The scikit-learn baseline is pending.
+- Existing runs require independent
+  reproducibility verification.
+
+The results remain preliminary until
+the main experiment pipeline has been
+fully validated.
 
 ## 8. Project Status
 
-The project has completed its initial
-paper analysis and experiment planning.
-
-### Current Progress
+### Completed Work
 
 - Reviewed the original XGBoost paper.
 - Selected Table 3 as the reproduction target.
-- Defined the primary evaluation metrics.
-- Developed the initial experimental protocol.
-- Added the dataset preparation script.
-- Created the initial training script.
-- Established the repository structure.
-- Completed an initial XGBoost training run.
-- Uploaded preliminary XGBoost results
-  for three random seeds.
-- Identified reproducibility issues
-  requiring further validation.
+- Established the experimental protocol.
+- Implemented dataset preparation.
+- Implemented initial XGBoost training.
+- Corrected feature selection to include
+  all 28 numerical features.
+- Updated the data splitting strategy.
+- Recorded XGBoost results for three seeds.
+- Generated training and validation AUC curves.
+- Generated ROC visualizations.
+- Added an experimental result validation script.
 
 ### Work in Progress
 
-- Correcting the feature selection to use
-  all 28 numerical features.
-- Improving random seed configuration
-  and experiment reproducibility.
-- Validating the three preliminary
-  XGBoost result files and logs.
+- Making random seed configuration reproducible.
+- Validating dependencies and environment settings.
+- Aligning the tree construction and timing protocols.
 - Completing the scikit-learn baseline.
-- Implementing statistical result analysis.
-- Preparing the extension experiment.
+- Integrating statistical analysis and visualizations.
+- Investigating discrepancies from the original paper.
 
-The main experimental results have not
-yet been finalized.
+### Planned Work
+
+- Conduct the maximum tree depth extension.
+- Complete controlled comparison experiments.
+- Prepare the final reproduction report.
+- Prepare the final presentation.
+
+The main reproduction is still in progress.
+Final conclusions will be drawn after the
+remaining experiments and analyses are completed.
 
 ## 9. References
 
