@@ -1,4 +1,5 @@
 import csv
+import math
 import statistics
 import argparse
 from pathlib import Path
@@ -20,7 +21,8 @@ def read_experiments(file_path):
         "model",
         "seed",
         "test_auc",
-        "train_time_sec"
+        "train_time_sec",
+        "n_estimators_actual",
     ]
 
     groups = defaultdict(
@@ -73,12 +75,26 @@ def read_experiments(file_path):
 
                 auc = float(row["test_auc"])
                 train_time = float(row["train_time_sec"])
+                actual_trees = int(row["n_estimators_actual"])
 
-                if not 0 <= auc <= 1:
-                    raise ValueError("AUC must be between 0 and 1")
+                if not math.isfinite(auc) or not 0 <= auc <= 1:
+                    raise ValueError(
+                        "AUC must be a finite value between 0 and 1"
+                    )
 
-                if train_time < 0:
-                    raise ValueError("Training time cannot be negative")
+                if (
+                    not math.isfinite(train_time)
+                    or train_time <= 0
+                ):
+                    raise ValueError(
+                        "Training time must be a finite "
+                        "positive number"
+                    )
+
+                if actual_trees <= 0:
+                    raise ValueError(
+                        "Actual number of trees must be positive"
+                    )
 
                 max_depth = (
                     row.get("max_depth", "").strip() or "N/A"
@@ -86,25 +102,19 @@ def read_experiments(file_path):
 
                 key = (experiment_type, model, max_depth)
 
+                if seed in groups[key]["seeds"]:
+                    raise ValueError(
+                        f"Duplicate seed {seed} "
+                        f"for {model} with depth {max_depth}"
+                    )
+
                 groups[key]["auc"].append(auc)
                 groups[key]["train_time"].append(train_time)
                 groups[key]["seeds"].append(seed)
 
-                actual_trees = row.get(
-                    "n_estimators_actual", ""
-                ).strip()
-
-                if actual_trees:
-                    actual_trees = int(actual_trees)
-
-                    if actual_trees <= 0:
-                        raise ValueError(
-                            "Actual number of trees must be positive"
-                        )
-
-                    groups[key]["time_per_tree"].append(
-                        train_time / actual_trees
-                    )
+                groups[key]["time_per_tree"].append(
+                    train_time / actual_trees
+                )
 
             except (ValueError, TypeError) as error:
                 raise ValueError(
@@ -141,6 +151,18 @@ def calculate_summary(groups):
 
         mean_time = statistics.mean(time_values)
 
+        std_train_time = (
+            statistics.stdev(time_values)
+            if len(time_values) >= 2
+            else ""
+        )
+
+        std_tree_time = (
+            statistics.stdev(tree_times)
+            if len(tree_times) >= 2
+            else ""
+        )
+
         mean_tree_time = (
             statistics.mean(tree_times)
             if tree_times
@@ -160,11 +182,25 @@ def calculate_summary(groups):
                 else ""
             ),
             "mean_train_time_sec": round(mean_time, 4),
+            
+            "std_train_time_sec": (
+                round(std_train_time, 4)
+                if std_train_time != ""
+                else ""
+            ),
+
             "mean_time_per_tree_sec": (
                 round(mean_tree_time, 6)
                 if mean_tree_time != ""
                 else ""
-            )
+            ),
+            
+            "std_time_per_tree_sec": (
+                round(std_tree_time, 6)
+                if std_tree_time != ""
+                else ""
+            ),
+
         })
 
     return summary
@@ -188,7 +224,9 @@ def save_summary(summary, output_path):
         "mean_test_auc",
         "std_test_auc",
         "mean_train_time_sec",
-        "mean_time_per_tree_sec"
+        "std_train_time_sec",
+        "mean_time_per_tree_sec",
+        "std_time_per_tree_sec",
     ]
 
     with open(
@@ -247,9 +285,10 @@ def main():
             )
 
         print("\nAnalysis completed successfully.")
-
+    
     except (FileNotFoundError, ValueError) as error:
         print(f"\nError: {error}")
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
