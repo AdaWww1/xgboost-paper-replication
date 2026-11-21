@@ -123,8 +123,23 @@ before the main analysis:
 
 ## 9. Current Status
 
-The analysis framework has been prepared.
+The initial XGBoost statistical analysis
+pipeline has been implemented and integrated.
 
-Statistical analysis and visualizations
-will be completed after the main experiments
-are conducted.
+Completed preliminary work includes:
+
+- Statistical aggregation across three seeds.
+- Mean and sample standard deviation for AUC.
+- Mean and sample standard deviation for
+  training time and time per tree.
+- Updated experimental figures.
+- Validation of committed result records.
+
+The scikit-learn baseline, independent
+reproducibility checks and maximum tree
+depth extension remain pending.
+
+The current results are preliminary and
+should not be interpreted as a completed
+reproduction of the original paper.
+
