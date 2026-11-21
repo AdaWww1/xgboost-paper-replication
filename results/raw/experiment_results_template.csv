@@ -1,0 +1,1 @@
+run_id,experiment_type,model,dataset,seed,split_id,max_depth,n_estimators_requested,n_estimators_actual,test_auc,train_time_sec,hardware,notes
