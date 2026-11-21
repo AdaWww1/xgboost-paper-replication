@@ -84,7 +84,9 @@ xgboost-paper-replication/
 ├── requirements.txt
 ├── docs/
 │   ├── paper_notes.md
-│   └── replication_plan.md
+│   ├── replication_plan.md
+│   ├── results_analysis_plan.md
+│   └── preliminary_results_analysis.md
 ├── logs/
 │   ├── higgs_xgb_seed42.log
 │   ├── higgs_xgb_seed123.log
@@ -98,23 +100,38 @@ xgboost-paper-replication/
 │   ├── higgs_xgb_seed2026_curve.csv
 │   ├── roc_curve_seed42.png
 │   ├── roc_curve_seed123.png
-│   └── roc_curve_seed2026.png
+│   ├── roc_curve_seed2026.png
+│   ├── raw/
+│   │   ├── experiment_results_template.csv
+│   │   └── xgb_preliminary_seed_results.csv
+│   ├── summary/
+│   │   └── model_summary.csv
+│   └── figures/
+│       ├── test_auc_by_seed.png
+│       └── training_time_per_tree_by_seed.png
 └── scripts/
     ├── download_higgs.py
     ├── train_higgs.py
-    └── validate_results.py
+    ├── validate_results.py
+    ├── sync_analysis_data.py
+    ├── analyze_results.py
+    └── plot_results.py
 ```
 
 ### Directory Description
 
 - `docs/`: Paper analysis and experimental design.
-- `scripts/`: Dataset preparation, model training
-  and result validation.
+- `scripts/`: Dataset preparation, model training,
+  result validation and statistical analysis.
+
 - `logs/`: Detailed training logs.
-- `results/`: Experimental metrics, AUC curves
-  and ROC visualizations.
+- `results/`: Experimental metrics, AUC curves,
+  ROC visualizations and statistical outputs.
 - `requirements.txt`: Python package dependencies.
 - `README.md`: Project overview and instructions.
+- `results/raw/`: Raw analysis input records.
+- `results/summary/`: Aggregated statistical results.
+- `results/figures/`: Experimental visualizations.
 
 The `data/` directory is generated locally
 and excluded from GitHub.
@@ -122,8 +139,12 @@ and excluded from GitHub.
 Experimental results and training logs are
 committed for reproducibility and analysis.
 
-Additional statistical analysis scripts
-and figures will be integrated after review.
+The preliminary statistical analysis scripts
+and figures have been integrated into the
+dedicated integration branch.
+
+They will be merged into `main`
+after final review.
 
 ## 6. Environment and Reproducibility
 
@@ -211,6 +232,38 @@ original HIGGS dataset.
 Passing these checks confirms file-level
 consistency but does not replace
 independent experimental reruns.
+
+### Statistical Analysis
+
+The preliminary XGBoost analysis pipeline
+can be reproduced from the committed results.
+
+Run the following commands from the
+repository root:
+
+```bash
+python scripts/validate_results.py
+python scripts/sync_analysis_data.py
+python scripts/analyze_results.py results/raw/xgb_preliminary_seed_results.csv
+python scripts/plot_results.py
+```
+
+The generated outputs include:
+
+- `results/raw/xgb_preliminary_seed_results.csv`
+- `results/summary/model_summary.csv`
+- `results/figures/test_auc_by_seed.png`
+- `results/figures/training_time_per_tree_by_seed.png`
+
+The statistical analysis framework was
+originally developed by ZHANG YU.
+
+The latest data synchronization, validation,
+statistical enhancements and result updates
+were completed by Xinyi Zhang.
+
+These commands process existing experiment
+outputs and do not retrain the models.
 
 ## 7. Experimental Results
 
@@ -300,6 +353,7 @@ fully validated.
 - Generated training and validation AUC curves.
 - Generated ROC visualizations.
 - Added an experimental result validation script.
+- Integrated the preliminary statistical analysis and updated visualizations.
 
 ### Work in Progress
 
@@ -307,7 +361,6 @@ fully validated.
 - Validating dependencies and environment settings.
 - Aligning the tree construction and timing protocols.
 - Completing the scikit-learn baseline.
-- Integrating statistical analysis and visualizations.
 - Investigating discrepancies from the original paper.
 
 ### Planned Work
