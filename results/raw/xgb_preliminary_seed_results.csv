@@ -1,4 +1,5 @@
 experiment_type,model,seed,test_auc,train_time_sec,max_depth,n_estimators_actual,notes
-preliminary_main_reproduction,XGBoost,42,0.8227768477891777,21.369874954223633,8,500,derived_from_time_per_tree_times_500
-preliminary_main_reproduction,XGBoost,123,0.822304734248504,16.620982885360718,8,500,derived_from_time_per_tree_times_500
-preliminary_main_reproduction,XGBoost,2026,0.8221771108528697,16.583582401275635,8,500,derived_from_time_per_tree_times_500
+preliminary_main_reproduction,XGBoost,42,0.8322396515802275,67.52275395393372,8,500,derived_from_time_per_tree_times_500;source=higgs_xgb_seed42.csv
+preliminary_main_reproduction,XGBoost,123,0.8302177493338021,68.93432569503784,8,500,derived_from_time_per_tree_times_500;source=higgs_xgb_seed123.csv
+preliminary_main_reproduction,XGBoost,2026,0.8310359405763099,73.93828272819519,8,500,derived_from_time_per_tree_times_500;source=higgs_xgb_seed2026.csv
+
