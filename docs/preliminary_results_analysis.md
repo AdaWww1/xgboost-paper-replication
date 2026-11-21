@@ -23,92 +23,220 @@ The current preliminary experiments use the following configuration:
 | Random Seeds | 42, 123, 2026 |
 | Evaluation Metric | Test AUC |
 
-## 3. Preliminary Experimental Results
+## 3. Updated Preliminary Experimental Results
 
-The following results were collected from three experimental records in the preliminary results CSV file.
+The following results were obtained from the
+latest XGBoost experiment records for three
+random seeds: 42, 123, and 2026.
 
-| Random Seed | Test AUC | Time per Tree (s) |
+The original per-seed CSV files were produced
+by the model training workstream.
+
+The analysis input was synchronized using
+scripts/sync_analysis_data.py.
+
+| Seed | Test AUC | Time per Tree (s) |
 |---|---:|---:|
-| 42 | 0.822777 | 0.042740 |
-| 123 | 0.822305 | 0.033242 |
-| 2026 | 0.822177 | 0.033167 |
+| 42 | 0.832240 | 0.135046 |
+| 123 | 0.830218 | 0.137869 |
+| 2026 | 0.831036 | 0.147877 |
 
 ### 3.1 Statistical Summary
 
-The mean and sample standard deviation were calculated across the three recorded results.
+The mean and sample standard deviation were
+calculated across the three experiment records.
 
-| Metric | Mean | Standard Deviation |
+| Metric | Mean | Sample Std |
 |---|---:|---:|
-| Test AUC | 0.822420 | 0.000316 |
-| Time per Tree (s) | 0.036383 | 0.005505 |
+| Test AUC | 0.831164 | 0.001017 |
+| Time per Tree (s) | 0.140264 | 0.006742 |
+| Derived Total Training Time (s) | 70.1318 | 3.3712 |
 
-The estimated mean total training time is approximately 18.1915 seconds, calculated by multiplying the mean time per tree by 500 boosting rounds.
+Total training time was derived by multiplying
+the reported time per tree by 500 rounds.
 
-This is an estimate rather than an independently recorded total training time.
+It was not independently measured by the
+analysis pipeline.
 
-## 3.2 Experimental Visualizations
+The statistical results were generated using
+scripts/analyze_results.py.
 
-### Figure 1. Test AUC Across Random Seeds
+### 3.2 Experimental Visualizations
+
+#### Figure 1. Test AUC Across Random Seeds
 
 ![Test AUC Across Random Seeds](../results/figures/test_auc_by_seed.png)
 
-The figure illustrates the Test AUC values obtained from three different random seeds. The results show relatively small variation in classification performance.
+The figure shows relatively small variation in
+Test AUC across the three recorded seeds.
 
-### Figure 2. Training Time per Tree Across Random Seeds
+The vertical axis is truncated to make small
+differences easier to visualize.
+
+#### Figure 2. Training Time per Tree
 
 ![Training Time per Tree Across Random Seeds](../results/figures/training_time_per_tree_by_seed.png)
 
-The figure compares the average training time per tree across the three recorded random seeds. Seed 42 shows a higher training time per tree than the other two runs.
+The training time per tree varies across runs.
 
-## 4. Preliminary Analysis
+Seed 2026 has the highest recorded time per tree,
+while seed 42 has the lowest.
 
-### 4.1 Classification Performance
+These differences require further investigation
+before their causes can be determined.
 
-The three recorded Test AUC values are close to each other, with a mean of approximately 0.822420.
+## 4. Comparison with the Original Paper
 
-The sample standard deviation is approximately 0.000316, indicating relatively small variation in the recorded AUC values.
+The original XGBoost paper reports a Test AUC
+of 0.8304 for XGBoost in Table 3.
 
-### 4.2 Training Efficiency
+Our preliminary mean Test AUC is 0.831164.
 
-The mean time per tree is approximately 0.036383 seconds.
+The absolute difference is approximately:
 
-However, the result for random seed 42 has a noticeably higher training time per tree than the other two records.
+0.831164 - 0.8304 = +0.000764
 
-This difference should be investigated in subsequent experiments, particularly with respect to the execution environment and experimental reproducibility.
+The result is numerically close to the
+original paper's reported value.
 
-### 4.3 Preliminary Observations
+However, this does not establish an exact
+reproduction because the experimental
+conditions are not fully aligned.
 
-The current results provide an initial reference for evaluating XGBoost performance.
+Potential sources of discrepancy include:
 
-However, they are not sufficient to establish the final reproducibility of the original paper's experimental results.
+- Dataset subset selection.
+- Training, validation and test splitting.
+- Software and library versions.
+- Hardware configuration.
+- Tree construction methods.
+- Training-time measurement protocols.
 
-## 5. Data Quality and Reproducibility Limitations
+The original paper's absolute training time
+cannot be directly compared with our current
+measurements without accounting for these
+differences.
 
-Several issues require further verification:
+The scikit-learn baseline is not yet available,
+so the full performance and efficiency
+comparison remains incomplete.
 
-1. The committed training script currently uses a fixed random seed, which needs to be made configurable.
-2. The current feature selection uses 27 features instead of the expected 28 features.
-3. The log associated with random seed 42 requires correction and verification.
-4. The three recorded experiment results need to be reproduced using a consistent and verified training pipeline.
-5. The hardware and software environment should be documented for a fair interpretation of training efficiency.
+## 5. Reproducibility Assessment
 
-Therefore, all results in this report should be treated as preliminary rather than final validated experimental findings.
+The existing experimental output files were
+checked using scripts/validate_results.py.
+
+All three seeds passed the file-consistency
+checks.
+
+The validator checks the consistency of:
+
+- Experimental result CSV files.
+- Recorded random seeds.
+- AUC and timing values.
+- Boosting-round records.
+- Training and validation AUC curves.
+- Training logs.
+
+However, passing these checks does not
+demonstrate independent experimental
+reproducibility.
+
+The latest training implementation uses
+all 28 input features.
+
+The earlier 27-feature problem has been
+corrected.
+
+Remaining limitations include:
+
+1. The committed training script still uses
+   a fixed random seed value.
+
+2. The XGBoost tree construction method
+   is not explicitly configured.
+
+3. Hardware and software information
+   is not fully documented.
+
+4. The scikit-learn baseline has not
+   been completed.
+
+5. Independent controlled reruns are
+   still required.
+
+Therefore, these results should be treated
+as preliminary rather than final evidence
+of successful paper reproduction.
 
 ## 6. Next Steps
 
-The following tasks are recommended:
+The remaining work includes:
 
-- Verify the training process for all three random seeds.
-- Correct the feature selection and confirm the number of input features.
-- Record actual training time and model configuration consistently.
-- Complete the scikit-learn baseline experiments.
-- Compare the validated results with the corresponding results in the original XGBoost paper.
-- Conduct the planned maximum tree depth sensitivity experiments.
+1. Make random seeds configurable in the
+   training script.
+
+2. Complete the scikit-learn baseline under
+   comparable experimental conditions.
+
+3. Verify library versions and hardware
+   configurations.
+
+4. Align the training and evaluation protocols.
+
+5. Conduct the maximum tree depth extension
+   using depths 4, 6, 8 and 10.
+
+6. Generate the final Paper vs. Ours comparison.
+
+7. Prepare the final experimental analysis
+   and reproducibility conclusions.
 
 ## 7. Conclusion
 
-The preliminary analysis establishes an initial statistical reference for the XGBoost experiments.
+The updated preliminary experiments produced
+a mean Test AUC of 0.831164 with a sample
+standard deviation of 0.001017.
 
-The recorded mean Test AUC is 0.822420, with a sample standard deviation of 0.000316.
+The mean time per tree was 0.140264 seconds,
+with a sample standard deviation of 0.006742.
 
-Further verification and additional experiments are necessary before drawing final conclusions about the reproduction of the original paper.
+The mean Test AUC is numerically close
+to the value reported in the original paper.
+
+However, additional controlled experiments
+are required before the main reproduction
+claims can be fully evaluated.
+
+This analysis provides an updated reference
+for subsequent model comparison and
+extension experiments.
+
+## 8. Contribution and Integration Notes
+
+The original statistical analysis framework,
+visualization scripts and preliminary report
+were developed by ZHANG YU (2260032265).
+
+The updated analysis integration was carried
+out by Xinyi Zhang (2260031561).
+
+The integration work includes:
+
+- Developing an automated data synchronization
+  script for the latest XGBoost results.
+- Extending statistical analysis to include
+  training-time standard deviations.
+- Improving input data validation.
+- Regenerating statistical summaries and figures.
+- Updating the preliminary analysis and
+  reproducibility limitations.
+
+The original contribution history is preserved
+through Git commits and the integration branch.
+
+The training results used in this analysis
+originate from the model implementation
+workstream and are not claimed as newly
+generated training runs.
+
