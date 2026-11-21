@@ -140,11 +140,11 @@ Experimental results and training logs are
 committed for reproducibility and analysis.
 
 The preliminary statistical analysis scripts
-and figures have been integrated into the
-dedicated integration branch.
+and figures are included in this repository.
 
-They will be merged into `main`
-after final review.
+They process the committed experimental
+outputs without independently rerunning
+model training.
 
 ## 6. Environment and Reproducibility
 
