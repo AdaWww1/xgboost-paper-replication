@@ -498,5 +498,5 @@
 [497] train-auc:0.900457 valid-auc:0.829437
 [498] train-auc:0.900563 valid-auc:0.829427
 [499] train-auc:0.900641 valid-auc:0.829419
-Average time per tree:0.1642s
+Average time per tree:0.1577s
 Test AUC:0.8322
