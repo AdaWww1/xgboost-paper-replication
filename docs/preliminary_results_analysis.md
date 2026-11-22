@@ -121,8 +121,42 @@ seeds would help determine whether the
 observed timing variation is systematic
 or caused by run-to-run execution differences.
 
+### 3.4 Learning Curve Analysis
 
-### 3.4 Experimental Visualizations
+To further investigate the learning behavior of XGBoost, the training and validation AUC curves were analyzed across 500 boosting rounds.
+
+The analysis uses the recorded training and validation AUC values from three random seeds: 42, 123 and 2026. The mean AUC and sample standard deviation were calculated at each boosting round.
+
+The following table summarizes the learning process at selected checkpoints.
+
+| Boosting Rounds | Mean Training AUC | Mean Validation AUC | AUC Gap |
+|---:|---:|---:|---:|
+| 1 | 0.765524 | 0.760634 | 0.004890 |
+| 100 | 0.840193 | 0.819010 | 0.021183 |
+| 250 | 0.868492 | 0.826143 | 0.042350 |
+| 500 | 0.900167 | 0.829102 | 0.071066 |
+
+The AUC gap is calculated as the difference between training AUC and validation AUC.
+
+**Figure 3. Training and Validation AUC Across Boosting Rounds**
+
+![Learning Curves](../results/figures/learning_curves_mean_auc.png)
+
+The learning curves reveal three main observations.
+
+First, both training and validation AUC increase rapidly during the initial boosting rounds, indicating that the model learns useful classification patterns early in training.
+
+Second, validation AUC gradually approaches a plateau, while training AUC continues to increase. This indicates diminishing improvements in validation performance as more boosting rounds are added.
+
+Third, the gap between training and validation AUC increases from 0.004890 at the first boosting round to 0.071066 at the 500th round. This suggests an increasing degree of overfitting tendency as training progresses.
+
+However, validation AUC does not show a substantial decline during the experiment. Therefore, the results do not provide sufficient evidence to conclude that severe overfitting has occurred.
+
+Overall, increasing the number of boosting rounds improves training performance, but the corresponding gains in validation performance become progressively smaller. This suggests that further increases in training iterations may provide limited generalization benefits under the current experimental configuration.
+
+The shaded regions represent one sample standard deviation across the three random seeds.
+
+### 3.5 Experimental Visualizations
 
 #### Figure 1. Test AUC Across Random Seeds
 
@@ -146,88 +180,240 @@ while seed 42 has the lowest.
 These differences require further investigation
 before their causes can be determined.
 
+#### Figure 3. Training and Validation AUC Across Boosting Rounds
+
+![Training and Validation AUC Across Boosting Rounds](../results/figures/learning_curves_mean_auc.png)
+
+The figure presents the mean training and validation
+AUC across three random seeds.
+
+Training AUC continues to increase throughout
+the boosting process, while validation AUC
+shows progressively smaller improvements.
+
+### 3.6 Learning Curve and Generalization Gap Analysis
+
+To investigate the model's learning behavior,
+the training and validation AUC curves were
+analyzed across 500 boosting rounds.
+
+The following table summarizes the mean AUC
+at selected boosting rounds across three seeds.
+
+| Boosting Rounds | Mean Training AUC | Mean Validation AUC | Generalization Gap |
+|---:|---:|---:|---:|
+| 50 | 0.825114 | 0.811469 | 0.013646 |
+| 100 | 0.840193 | 0.819010 | 0.021183 |
+| 200 | 0.860590 | 0.824840 | 0.035750 |
+| 300 | 0.875955 | 0.827185 | 0.048770 |
+| 400 | 0.888861 | 0.828551 | 0.060309 |
+| 500 | 0.900167 | 0.829102 | 0.071066 |
+
+The results show that training AUC increases
+continuously as the number of boosting rounds grows.
+
+However, validation AUC improves more slowly.
+Between rounds 400 and 500, mean validation AUC
+increases by only approximately 0.000550,
+while training AUC increases by 0.011307.
+
+The generalization gap also increases from
+0.013646 at round 50 to 0.071066 at round 500.
+
+This indicates that the model continues to fit
+the training data increasingly well, while
+improvements in validation performance become
+limited.
+
+The growing generalization gap suggests a
+potential overfitting tendency.
+
+However, validation AUC does not show a
+substantial decline during the final boosting
+rounds. Therefore, the current evidence does
+not establish severe overfitting.
+
+Further experiments with different maximum
+tree depths and boosting rounds are needed
+to investigate this behavior.
+
+The validation AUC curves are used here
+to analyze learning behavior. They should
+not be confused with the final Test AUC
+reported in the main experimental results.
+
 ## 4. Comparison with the Original Paper
 
-The original XGBoost paper reports a Test AUC
-of 0.8304 for XGBoost in Table 3.
+### 4.1 Quantitative Comparison
 
-Our preliminary mean Test AUC is 0.831164.
+The preliminary XGBoost results were compared
+with the reference results reported in Table 3
+of the original paper.
 
-The absolute difference is approximately:
+| Method | Paper Test AUC | Our Test AUC | Paper Time per Tree (s) | Our Time per Tree (s) |
+|---|---:|---:|---:|---:|
+| XGBoost | 0.8304 | 0.831164 ± 0.001017 | 0.6841 | 0.140264 ± 0.006742 |
+| scikit-learn | 0.8302 | Pending | 28.51 | Pending |
 
-0.831164 - 0.8304 = +0.000764
+The XGBoost results are averaged across
+three random seeds: 42, 123 and 2026.
 
-The result is numerically close to the
-original paper's reported value.
+The scikit-learn baseline has not yet been
+completed, so its experimental results
+are currently unavailable.
 
-However, this does not establish an exact
-reproduction because the experimental
-conditions are not fully aligned.
+### 4.2 Performance Difference Analysis
 
-Potential sources of discrepancy include:
+The mean Test AUC obtained by our XGBoost
+implementation is 0.831164, compared with
+0.8304 reported in the original paper.
 
-- Dataset subset selection.
-- Training, validation and test splitting.
-- Software and library versions.
-- Hardware configuration.
-- Tree construction methods.
-- Training-time measurement protocols.
+The absolute difference is:
 
-The original paper's absolute training time
-cannot be directly compared with our current
-measurements without accounting for these
-differences.
+0.831164 - 0.8304 = 0.000764
 
-The scikit-learn baseline is not yet available,
-so the full performance and efficiency
-comparison remains incomplete.
+This indicates that our preliminary
+classification performance is numerically
+close to the original paper's result.
+
+In terms of training efficiency, our mean
+time per tree is 0.140264 seconds, compared
+with 0.6841 seconds in the original paper.
+
+Numerically, our measured time per tree
+is approximately 4.88 times shorter.
+
+However, this difference should not be
+interpreted as a direct speedup achieved
+by our implementation.
+
+The original paper and our experiments
+may differ in hardware, software versions,
+dataset selection, tree construction methods
+and timing protocols.
+
+In particular, our current training
+implementation includes training and
+validation AUC evaluation during each
+boosting round.
+
+These differences prevent a fully controlled
+comparison of absolute training efficiency.
+
+### 4.3 Reproduction Limitations
+
+Although the preliminary XGBoost Test AUC
+is close to the original paper's reported
+value, several experimental differences
+remain.
+
+1. **Dataset selection:** Our implementation
+   uses the first 1,000,000 rows of the HIGGS
+   dataset rather than the randomly selected
+   subset described in the paper.
+
+2. **Data splitting:** Our implementation
+   uses a 70/15/15 training, validation
+   and test split.
+
+3. **Tree construction:** The current
+   implementation does not explicitly
+   configure the tree construction method
+   used in the original experiment.
+
+4. **Computational environment:** Hardware
+   and software environments differ and
+   require further documentation.
+
+5. **Baseline comparison:** The scikit-learn
+   baseline has not yet been completed.
+
+Therefore, the current results demonstrate
+numerical agreement in preliminary
+classification performance, but do not
+establish an exact reproduction of the
+original experiment.
+
+A complete evaluation of the original
+performance and efficiency claims requires
+the scikit-learn baseline and further
+controlled experiments.
 
 ## 5. Reproducibility Assessment
 
-The existing experimental output files were
-checked using scripts/validate_results.py.
+### 5.1 Result File Validation
 
-All three seeds passed the file-consistency
-checks.
+The existing experimental outputs were checked
+using scripts/validate_results.py.
 
-The validator checks the consistency of:
+All three recorded experiment sets passed
+the file-consistency validation.
 
-- Experimental result CSV files.
-- Recorded random seeds.
-- AUC and timing values.
-- Boosting-round records.
-- Training and validation AUC curves.
-- Training logs.
+The validation process checks:
 
-However, passing these checks does not
-demonstrate independent experimental
-reproducibility.
+- Required experimental result files.
+- Consistency between CSV seed labels and filenames.
+- Validity of Test AUC and training-time values.
+- Completeness of the 500 boosting rounds.
+- Consistency between training logs and AUC curves.
+- Agreement between logged and recorded final metrics.
 
-The latest training implementation uses
-all 28 input features.
+The three recorded experiments contain
+different training curves and final results.
 
-The earlier 27-feature problem has been
-corrected.
+This indicates that the records are not
+identical copies of the same experimental output.
 
-Remaining limitations include:
+### 5.2 Random Seed Verification
 
-1. The committed training script still uses
-   a fixed random seed value.
+Although the result files are labelled
+with random seeds 42, 123 and 2026,
+the training logs do not explicitly record
+the random seed used during execution.
 
-2. The XGBoost tree construction method
-   is not explicitly configured.
+Furthermore, the current training script
+contains a hard-coded seed value of 123.
 
-3. Hardware and software information
-   is not fully documented.
+Consequently, the validation script can
+verify the consistency of the recorded files,
+but cannot independently verify the actual
+random seed used in each historical run.
 
-4. The scikit-learn baseline has not
-   been completed.
+The exact correspondence between the
+recorded seed labels and the original
+execution configurations therefore remains
+to be confirmed.
 
-5. Independent controlled reruns are
-   still required.
+### 5.3 Remaining Reproducibility Limitations
 
-Therefore, these results should be treated as preliminary rather than final evidence
-of successful paper reproduction.
+The following limitations remain:
+
+1. Historical random seed configurations
+   require confirmation.
+
+2. Random seed configuration should be
+   made adjustable through command-line
+   arguments or an experiment loop.
+
+3. The actual random seed should be
+   explicitly recorded in each training log.
+
+4. The XGBoost tree construction method
+   requires explicit configuration.
+
+5. Hardware and software environments
+   require more complete documentation.
+
+6. Independent experimental reruns
+   are still required.
+
+Passing file-consistency validation does
+not establish independent reproducibility.
+
+Therefore, the current results should
+remain classified as preliminary evidence
+until the experimental configurations
+can be independently verified.
 
 ## 6. Next Steps
 
