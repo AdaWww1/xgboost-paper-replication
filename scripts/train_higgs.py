@@ -49,7 +49,6 @@ def main():
             "eta":0.1,
             "objective":"binary:logistic",
             "eval_metric":"auc",
-            "nthread":8,
             "seed":seed
         }
         num_rounds = 500
