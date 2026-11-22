@@ -61,7 +61,68 @@ analysis pipeline.
 The statistical results were generated using
 scripts/analyze_results.py.
 
-### 3.2 Experimental Visualizations
+
+### 3.2 Cross-Seed Stability Analysis
+
+To further evaluate the stability of the preliminary
+XGBoost results, the variation across the three
+random seeds was examined.
+
+The coefficient of variation (CV) was calculated
+as the sample standard deviation divided by
+the corresponding mean.
+
+| Metric | Mean | Sample Std | Range | CV |
+|---|---:|---:|---:|---:|
+| Test AUC | 0.831164 | 0.001017 | 0.002022 | 0.122% |
+| Time per Tree (s) | 0.140264 | 0.006742 | 0.012831 | 4.807% |
+
+The Test AUC shows relatively low variation
+across the three recorded random seeds.
+This suggests that the preliminary classification
+performance is relatively stable under the
+current experimental configuration.
+
+In contrast, training time per tree exhibits
+greater relative variation.
+
+Seed 42 achieved both the highest Test AUC
+and the lowest recorded training time per tree.
+Seed 2026 had the highest training time,
+but did not achieve the highest Test AUC.
+
+Therefore, the three recorded runs do not
+show a consistent relationship between
+training time and classification performance.
+
+However, only three random seeds are available.
+These observations are descriptive and
+should not be interpreted as statistical evidence
+of a general relationship.
+
+The training-time records are based on the
+existing experiment outputs. The reported
+total training time in the analysis input
+is derived from time per tree multiplied
+by 500 boosting rounds, rather than being
+an independent timing measurement.
+
+### 3.3 Experimental Interpretation
+
+The current results indicate that XGBoost
+achieves relatively consistent classification
+performance across the three recorded seeds.
+
+The variation in training time is larger
+than the variation in Test AUC.
+
+Further experiments with additional random
+seeds would help determine whether the
+observed timing variation is systematic
+or caused by run-to-run execution differences.
+
+
+### 3.4 Experimental Visualizations
 
 #### Figure 1. Test AUC Across Random Seeds
 
@@ -165,8 +226,7 @@ Remaining limitations include:
 5. Independent controlled reruns are
    still required.
 
-Therefore, these results should be treated
-as preliminary rather than final evidence
+Therefore, these results should be treated as preliminary rather than final evidence
 of successful paper reproduction.
 
 ## 6. Next Steps
