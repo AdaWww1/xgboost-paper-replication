@@ -90,7 +90,10 @@ xgboost-paper-replication/
 ├── logs/
 │   ├── higgs_xgb_seed42.log
 │   ├── higgs_xgb_seed123.log
-│   └── higgs_xgb_seed2026.log
+│   ├── higgs_xgb_seed2026.log
+│   ├── higgs_sklearn_seed42.log
+│   ├── higgs_sklearn_seed123.log
+│   └── higgs_sklearn_seed2026.log
 ├── results/
 │   ├── higgs_xgb_seed42.csv
 │   ├── higgs_xgb_seed123.csv
@@ -115,7 +118,8 @@ xgboost-paper-replication/
     ├── validate_results.py
     ├── sync_analysis_data.py
     ├── analyze_results.py
-    └── plot_results.py
+    ├── plot_results.py
+    └── train_sklearn_histgb.py
 ```
 
 ### Directory Description
@@ -188,25 +192,42 @@ committed to GitHub because of its size.
 
 ### Training Environment
 
-The XGBoost training implementation has
-been updated to use all 28 input features.
+The XGBoost training implementation uses
+all 28 input features and supports a
+multi-seed experiment loop.
 
-The current configuration includes:
+The current XGBoost configuration includes:
 
 - Training/validation/test split: 70/15/15
 - Number of boosting rounds: 500
 - Maximum tree depth: 8
 - Learning rate: 0.1
-- CPU threads: 8
+- Random seeds: 42, 123, 2026
 - Evaluation metric: AUC
+- CPU threads: Not explicitly configured
+- Tree method: Not explicitly configured
 
-The current training script still uses
-a fixed random seed.
+A scikit-learn baseline script has also
+been added using HistGradientBoostingClassifier.
 
-The dependency file, tree construction
-method and complete environment information
-require further verification before all
-experiments can be reproduced reliably.
+It uses 500 boosting iterations, maximum
+depth 8, learning rate 0.1 and the same
+three random seeds.
+
+This baseline is a modern histogram-based
+implementation and is not an exact
+reproduction of the original paper's
+scikit-learn benchmark.
+
+Preliminary baseline logs are available,
+but the corresponding result CSV files
+have not yet been committed.
+
+The dependency file, CPU configuration,
+tree construction method and complete
+environment information require further
+verification before reliable comparisons
+can be made.
 
 ### Result Validation
 
@@ -233,10 +254,34 @@ Passing these checks confirms file-level
 consistency but does not replace
 independent experimental reruns.
 
+A validation performed on November 26, 2026
+reported training-time inconsistencies
+for all three XGBoost seeds.
+
+The result was 0/3 PASS.
+
+These discrepancies remain unresolved,
+so the existing efficiency statistics
+must be treated as preliminary.
+
+The training records should be reconciled
+and validated again before the results
+are used for final model comparisons.
+
 ### Statistical Analysis
 
-The preliminary XGBoost analysis pipeline
-can be reproduced from the committed results.
+The preliminary statistical analysis
+pipeline processes committed result CSVs.
+
+However, the current XGBoost training-time
+records have not passed the latest
+file-consistency validation.
+
+The commands below can reproduce the
+existing preliminary analysis, but the
+generated efficiency statistics must not
+be treated as validated results until
+the source records are reconciled.
 
 Run the following commands from the
 repository root:
@@ -281,11 +326,24 @@ files for three random seeds.
 | Mean | 0.831164 | 0.140264 |
 | Sample Standard Deviation | 0.001017 | 0.006742 |
 
-The results are calculated from the
-latest CSV files in the results directory.
+These preliminary statistics were calculated
+from previously committed XGBoost result CSVs.
 
-Corresponding training logs are available
-in the logs directory.
+A subsequent file-consistency validation on
+November 26, 2026 found training-time
+mismatches between the CSV files and logs
+for all three seeds.
+
+The reported AUC values remain consistent
+within the logging precision, but the
+training-time records require reconciliation.
+
+Therefore, the reported efficiency statistics
+are retained for reference only and must
+not be treated as validated measurements.
+
+Updated statistics will be generated after
+the training records have been reconciled.
 
 ### Comparison with the Original Paper
 
@@ -295,6 +353,18 @@ in the logs directory.
 | Time per Tree (s) | 0.6841 | 0.140264 ± 0.006742 |
 
 Reference: Table 3 of the original paper.
+
+The values in the Ours column are preliminary
+results from previously committed CSV files.
+
+The current training-time comparison is not
+validated because the corresponding logs
+contain inconsistent timing values.
+
+In addition, differences in tree construction,
+software versions, hardware and timing
+protocols prevent a direct efficiency
+comparison with the original paper.
 
 The current mean Test AUC is numerically
 close to the reference value.
@@ -323,19 +393,30 @@ in the results directory.
 
 ### Reproducibility Limitations
 
-- The committed training script still
-  uses a fixed random seed.
-- The XGBoost tree method is not
-  explicitly configured.
-- Hardware and software information
-  is not yet fully documented.
-- The scikit-learn baseline is pending.
-- Existing runs require independent
-  reproducibility verification.
+- The XGBoost training script supports
+  a three-seed experiment loop, but
+  independent rerun verification is pending.
+- Training-time inconsistencies were found
+  between the existing CSV files and logs.
+- The XGBoost tree construction method
+  is not explicitly configured.
+- CPU thread settings and complete hardware
+  information have not been verified.
+- The dependency file requires correction
+  and installation testing.
+- A modern scikit-learn HistGradientBoosting
+  baseline has been implemented, but its
+  result CSV files are not yet committed.
+- The current sklearn baseline is not
+  identical to the original paper's
+  scikit-learn benchmark.
+- Aligned model comparisons and extension
+  experiments remain incomplete.
 
-The results remain preliminary until
-the main experiment pipeline has been
-fully validated.
+The results remain preliminary until the
+training records, computational environment
+and model comparison procedures have been
+independently validated.
 
 ## 8. Project Status
 
@@ -349,30 +430,44 @@ fully validated.
 - Corrected feature selection to include
   all 28 numerical features.
 - Updated the data splitting strategy.
-- Recorded XGBoost results for three seeds.
+- Added a multi-seed XGBoost training loop
+  for seeds 42, 123 and 2026.
+- Recorded preliminary XGBoost results
+  for three seeds.
 - Generated training and validation AUC curves.
 - Generated ROC visualizations.
 - Added an experimental result validation script.
-- Integrated the preliminary statistical analysis and updated visualizations.
+- Integrated the preliminary statistical
+  analysis and updated visualizations.
+- Added a preliminary scikit-learn
+  HistGradientBoosting baseline script.
+- Committed preliminary sklearn training logs.
+- Identified training-time inconsistencies
+  through a new validation check.
 
 ### Work in Progress
 
-- Making random seed configuration reproducible.
+- Reconciling XGBoost CSV and log timing values.
+- Independently verifying multi-seed training.
 - Validating dependencies and environment settings.
-- Aligning the tree construction and timing protocols.
-- Completing the scikit-learn baseline.
+- Aligning tree construction and timing protocols.
+- Completing and validating sklearn baseline outputs.
+- Evaluating baseline comparability with the paper.
 - Investigating discrepancies from the original paper.
 
 ### Planned Work
 
 - Conduct the maximum tree depth extension.
-- Complete controlled comparison experiments.
+- Complete controlled model comparisons.
+- Update statistical analysis using validated data.
 - Prepare the final reproduction report.
 - Prepare the final presentation.
 
 The main reproduction is still in progress.
+
 Final conclusions will be drawn after the
-remaining experiments and analyses are completed.
+remaining experiments, result validation
+and comparative analyses are completed.
 
 ## 9. References
 
