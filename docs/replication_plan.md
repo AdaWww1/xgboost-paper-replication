@@ -104,8 +104,8 @@ data splits for each random seed.
 | Evaluation metric | AUC | AUC |
 | Tree method | Exact greedy | Library default |
 | Column sampling | 1.0 | Not explicitly configured |
-| CPU threads | To be aligned | 8 |
-| Random seeds | 42, 123, 2026 | Currently hard-coded to 123 |
+| CPU threads | To be aligned | Not explicitly configured |
+| Random seeds | 42, 123, 2026 | Multi-seed loop: 42, 123, 2026 |
 
 The current implementation uses
 the XGBoost Python training API.
@@ -113,12 +113,23 @@ the XGBoost Python training API.
 The tree method is not explicitly specified
 in the current training script.
 
-The scikit-learn baseline is planned to use
-sklearn.ensemble.GradientBoostingClassifier.
+The current scikit-learn baseline script
+uses HistGradientBoostingClassifier with
+500 boosting iterations, maximum depth 8
+and learning rate 0.1.
 
-The baseline implementation and the final
-experimental settings still require validation
-before a fair model comparison can be made.
+This histogram-based implementation differs
+from the conventional gradient boosting
+baseline originally planned for this study.
+
+Therefore, the current baseline should be
+treated as a modern supplementary comparison
+rather than an exact reproduction of the
+original paper's scikit-learn benchmark.
+
+A closer baseline implementation and aligned
+experimental settings remain to be evaluated
+before drawing final efficiency conclusions.
 
 ## 4. Environment and Reproducibility
 
@@ -170,22 +181,47 @@ experimental settings.
 
 ### Current Implementation Status
 
-Experimental result files and training logs
-are available for seeds 42, 123 and 2026.
+The updated XGBoost training script now
+supports a multi-seed experiment loop using
+random seeds 42, 123 and 2026.
 
-However, the committed training script
-currently uses a fixed seed value of 123.
+The repository contains XGBoost result CSV
+files, training logs, AUC curves and ROC
+visualizations for all three seeds.
 
-The seed should be made configurable
-through a command-line argument or
-a multi-seed experiment loop.
+However, a validation performed on
+November 26, 2026 identified inconsistencies
+between the training times recorded in
+the CSV files and the corresponding logs.
 
-This is required to reproduce all three
-runs without manually modifying the code.
+The validation results were:
 
-The consistency of the existing result files
-and training logs will be checked before
-the results are used in the final analysis.
+- Seed 42: Training time mismatch.
+- Seed 123: Training time mismatch.
+- Seed 2026: Training time mismatch.
+
+The validation outcome was 0/3 PASS.
+
+The cause of these discrepancies has not
+yet been confirmed. The training workstream
+will review and reconcile the corresponding
+experimental records.
+
+The existing training-time statistics
+remain preliminary and should not be used
+as validated evidence of training efficiency.
+
+A scikit-learn baseline script using
+HistGradientBoostingClassifier has also
+been added to the repository.
+
+Preliminary baseline logs are available
+for three seeds, but corresponding result
+CSV files have not yet been committed.
+
+Independent experimental reruns, baseline
+alignment and environment verification
+remain necessary before final comparison.
 
 ## 6. Evaluation Method
 
@@ -264,11 +300,13 @@ full Higgs-1M reproduction results.
 | Data split | Exact procedure to be verified | 70/15/15 train/validation/test | Validation monitoring |
 | Input features | 28 | 28 | Feature selection corrected |
 | Tree method | Exact greedy | Library default | Explicit configuration pending |
-| CPU threads | To be verified | 8 | Current training configuration |
+| CPU threads | To be verified | Not explicitly configured | Thread configuration requires verification |
 | Software | 2016 implementations | Modern libraries | Software availability |
 | Hardware | Original benchmark machine | To be documented | Hardware availability |
 | Random seeds | Not specified for Table 3 | 42, 123, 2026 | Repeated evaluation |
 | Training-time measurement | Paper benchmark protocol | Training with per-round AUC evaluation | Timing alignment pending |
+| scikit-learn baseline | Original paper benchmark | HistGradientBoostingClassifier | Algorithmic alignment pending |
+| Result consistency | Matched experiment records | Training-time mismatches across three seeds | Revalidation pending |
 
 The current results are preliminary
 reproduction results.
